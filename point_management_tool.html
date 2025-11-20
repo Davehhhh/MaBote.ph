@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaBote.ph - Point Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: #f9f9f9;
+        }
+        
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .user-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-points {
+            font-weight: 600;
+            color: #4CAF50;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 MaBote.ph</h1>
+            <p>Point Management System</p>
+        </div>
+        
+        <div class="content">
+            <div class="warning">
+                ⚠️ <strong>Warning:</strong> These operations will modify user points. Use with caution!
+            </div>
+            
+            <!-- Add Points to Specific User -->
+            <div class="section">
+                <h3>🎯 Add Points to Specific User</h3>
+                <div class="form-group">
+                    <label for="userEmail">User Email:</label>
+                    <input type="email" id="userEmail" placeholder="stefanchan32@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label for="pointsToAdd">Points to Add:</label>
+                    <input type="number" id="pointsToAdd" placeholder="100" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="reason">Reason (Optional):</label>
+                    <input type="text" id="reason" placeholder="Bonus points, compensation, etc.">
+                </div>
+                <button class="btn" onclick="addPointsToUser()">Add Points</button>
+                <div id="addPointsResult" class="result"></div>
+            </div>
+            
+            <!-- Add Points to All Users -->
+            <div class="section">
+                <h3>🎁 Add Points to All Users</h3>
+                <div class="form-group">
+                    <label for="pointsToAll">Points to Add to Everyone:</label>
+                    <input type="number" id="pointsToAll" placeholder="50" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="reasonAll">Reason (Optional):</label>
+                    <input type="text" id="reasonAll" placeholder="Monthly bonus, special event, etc.">
+                </div>
+                <button class="btn btn-warning" onclick="addPointsToAll()">Add to All Users</button>
+                <div id="addPointsAllResult" class="result"></div>
+            </div>
+            
+            <!-- Reset All Points -->
+            <div class="section">
+                <h3>🔄 Reset All Points</h3>
+                <p><strong>DANGER:</strong> This will reset ALL user points to 0. This action cannot be undone!</p>
+                <div class="form-group">
+                    <label for="confirmReset">Type "RESET" to confirm:</label>
+                    <input type="text" id="confirmReset" placeholder="Type RESET to confirm">
+                </div>
+                <button class="btn btn-danger" onclick="resetAllPoints()">Reset All Points</button>
+                <div id="resetResult" class="result"></div>
+            </div>
+            
+            <!-- View All Users -->
+            <div class="section">
+                <h3>👥 View All Users</h3>
+                <button class="btn" onclick="loadUsers()">Load Users</button>
+                <div id="usersList" class="user-list" style="display: none;">
+                    <div class="loading">Loading users...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://192.168.254.119/mabote_api';
+        
+        async function addPointsToUser() {
+            const email = document.getElementById('userEmail').value;
+            const points = document.getElementById('pointsToAdd').value;
+            const reason = document.getElementById('reason').value;
+            const resultDiv = document.getElementById('addPointsResult');
+            
+            if (!email || !points) {
+                showResult(resultDiv, 'Please fill in email and points', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/add_points_to_user.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        points: parseInt(points),
+                        reason: reason || 'Manual addition'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(resultDiv, `Successfully added ${points} points to ${email}`, 'success');
+                } else {
+                    showResult(resultDiv, `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function addPointsToAll() {
+            const points = document.getElementById('pointsToAll').value;
+            const reason = document.getElementById('reasonAll').value;
+            const resultDiv = document.getElementById('addPointsAllResult');
+            
+            if (!points) {
+                showResult(resultDiv, 'Please enter points to add', 'error');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to add ${points} points to ALL users?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/add_points_to_all.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        points: parseInt(points),
+                        reason: reason || 'Bonus points'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(resultDiv, `Successfully added ${points} points to ${data.users_affected} users`, 'success');
+                } else {
+                    showResult(resultDiv, `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function resetAllPoints() {
+            const confirmText = document.getElementById('confirmReset').value;
+            const resultDiv = document.getElementById('resetResult');
+            
+            if (confirmText !== 'RESET') {
+                showResult(resultDiv, 'Please type "RESET" to confirm', 'error');
+                return;
+            }
+            
+            if (!confirm('Are you absolutely sure you want to reset ALL user points to 0? This cannot be undone!')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/reset_all_points.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(resultDiv, `Successfully reset points for ${data.users_affected} users`, 'success');
+                } else {
+                    showResult(resultDiv, `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadUsers() {
+            const usersList = document.getElementById('usersList');
+            usersList.style.display = 'block';
+            usersList.innerHTML = '<div class="loading">Loading users...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/get_all_users.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = '';
+                    data.users.forEach(user => {
+                        html += `
+                            <div class="user-item">
+                                <div class="user-info">
+                                    <strong>${user.first_name} ${user.last_name}</strong><br>
+                                    <small>${user.email}</small>
+                                </div>
+                                <div class="user-points">
+                                    ${user.total_points} pts<br>
+                                    <small>Balance: ${user.current_balance}</small>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    usersList.innerHTML = html;
+                } else {
+                    usersList.innerHTML = `<div class="result error">Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                usersList.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        function showResult(element, message, type) {
+            element.textContent = message;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

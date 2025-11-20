@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Automatic Notifications</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .user { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .result { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Test Automatic Notifications</h1>
+    <p>This will add bottle deposits using the PHP API, which should automatically create notifications.</p>
+    
+    <div class="user">
+        <h3>FF FF f fttt (User ID: 1)</h3>
+        <button onclick="addDeposit(1, 5)">Add 5 Bottles</button>
+        <button onclick="addDeposit(1, 8)">Add 8 Bottles</button>
+    </div>
+    
+    <div class="user">
+        <h3>warren jacaban (User ID: 2)</h3>
+        <button onclick="addDeposit(2, 3)">Add 3 Bottles</button>
+        <button onclick="addDeposit(2, 7)">Add 7 Bottles</button>
+    </div>
+    
+    <div class="user">
+        <h3>Tepe tepe (User ID: 3)</h3>
+        <button onclick="addDeposit(3, 4)">Add 4 Bottles</button>
+        <button onclick="addDeposit(3, 6)">Add 6 Bottles</button>
+    </div>
+    
+    <div class="user">
+        <h3>jammy rivas (User ID: 4)</h3>
+        <button onclick="addDeposit(4, 10)">Add 10 Bottles</button>
+        <button onclick="addDeposit(4, 12)">Add 12 Bottles</button>
+    </div>
+    
+    <div class="user">
+        <h3>loki chan (User ID: 5)</h3>
+        <button onclick="addDeposit(5, 6)">Add 6 Bottles</button>
+        <button onclick="addDeposit(5, 9)">Add 9 Bottles</button>
+    </div>
+    
+    <div class="user">
+        <h3>stefan chan (User ID: 6)</h3>
+        <button onclick="addDeposit(6, 15)">Add 15 Bottles</button>
+        <button onclick="addDeposit(6, 20)">Add 20 Bottles</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        async function addDeposit(userId, bottles) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Adding deposit...';
+            
+            try {
+                const response = await fetch(`http://192.168.254.119/mabote_api/simulate_bottle_deposit.php?user_id=${userId}&bottles=${bottles}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="result" style="background: #d4edda; border: 1px solid #c3e6cb;">
+                            <strong>✅ Success!</strong><br>
+                            User ${userId}: ${data.bottles_deposited} bottles deposited<br>
+                            Points earned: ${data.points_earned}<br>
+                            Transaction: ${data.transaction_code}<br>
+                            <strong>Notification should be created automatically!</strong>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result" style="background: #f8d7da; border: 1px solid #f5c6cb;">
+                            <strong>❌ Error:</strong> ${data.message}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result" style="background: #f8d7da; border: 1px solid #f5c6cb;">
+                        <strong>❌ Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
